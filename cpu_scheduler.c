@@ -12,7 +12,6 @@ typedef struct {
     int total_cpu_burst;
     int priority;
     
-    int cpu_executed;
     int waiting_time;
     int turnaround_time;
 } Process;
@@ -89,23 +88,23 @@ void NonPreemptiveSJF() {
     int finished[MAX_PROCESS] = { 0 };
 
     while (completed < process_count) {
-        int idx = -1;
+        int index = -1;
         int min_burst = 100;
         for (int i = 0; i < process_count; i++) {
             if (!finished[i] && processes[i].arrival_time <= time && processes[i].total_cpu_burst < min_burst) {
                 min_burst = processes[i].total_cpu_burst;
-                idx = i;
+                index = i;
             }
         }
-        if (idx == -1) {
+        if (index == -1) {
             time++;
             continue;
         }
-        processes[idx].waiting_time = time - processes[idx].arrival_time;
-        AddGanttEntry(processes[idx].pid, time, time + processes[idx].total_cpu_burst);
-        time += processes[idx].total_cpu_burst;
-        processes[idx].turnaround_time = time - processes[idx].arrival_time;
-        finished[idx] = 1;
+        processes[index].waiting_time = time - processes[index].arrival_time;
+        AddGanttEntry(processes[index].pid, time, time + processes[index].total_cpu_burst);
+        time += processes[index].total_cpu_burst;
+        processes[index].turnaround_time = time - processes[index].arrival_time;
+        finished[index] = 1;
         completed++;
     }
     printf("Non-preemptive SJF 스케줄링\n");
@@ -119,23 +118,23 @@ void NonPreemptivePriority() {
     int finished[MAX_PROCESS] = { 0 };
 
     while (completed < process_count) {
-        int idx = -1;
+        int index = -1;
         int highest_priority = 100;
         for (int i = 0; i < process_count; i++) {
             if (!finished[i] && processes[i].arrival_time <= time && processes[i].priority < highest_priority) {
                 highest_priority = processes[i].priority;
-                idx = i;
+                index = i;
             }
         }
-        if (idx == -1) {
+        if (index == -1) {
             time++;
             continue;
         }
-        processes[idx].waiting_time = time - processes[idx].arrival_time;
-        AddGanttEntry(processes[idx].pid, time, time + processes[idx].total_cpu_burst);
-        time += processes[idx].total_cpu_burst;
-        processes[idx].turnaround_time = time - processes[idx].arrival_time;
-        finished[idx] = 1;
+        processes[index].waiting_time = time - processes[index].arrival_time;
+        AddGanttEntry(processes[index].pid, time, time + processes[index].total_cpu_burst);
+        time += processes[index].total_cpu_burst;
+        processes[index].turnaround_time = time - processes[index].arrival_time;
+        finished[index] = 1;
         completed++;
     }
     printf("Non-preemptive Priority 스케줄링\n");
@@ -153,38 +152,38 @@ void PreemptiveSJF() {
     }
 
     while (completed < process_count) {
-        int idx = -1;
+        int index = -1;
         int min_remain = 100;
         for (int i = 0; i < process_count; i++) {
             if (processes[i].arrival_time <= time && remaining[i] > 0 && remaining[i] < min_remain) {
                 min_remain = remaining[i];
-                idx = i;
+                index = i;
             }
         }
-        if (idx == -1) {
+        if (index == -1) {
             time++;
             continue;
         }
 
-        if (last_pid != idx) {
+        if (last_pid != index) {
             if (last_pid != -1)
                 AddGanttEntry(last_pid, time - 1, time); 
-            AddGanttEntry(idx, time, time + 1);
+            AddGanttEntry(index, time, time + 1);
         }
         else {
-            if (gantt_size > 0 && gantt_chart[gantt_size - 1].pid == idx && gantt_chart[gantt_size - 1].end_time == time)
+            if (gantt_size > 0 && gantt_chart[gantt_size - 1].pid == index && gantt_chart[gantt_size - 1].end_time == time)
                 gantt_chart[gantt_size - 1].end_time++;
             else
-                AddGanttEntry(idx, time, time + 1);
+                AddGanttEntry(index, time, time + 1);
         }
 
-        remaining[idx]--;
+        remaining[index]--;
         time++;
-        last_pid = idx;
+        last_pid = index;
 
-        if (remaining[idx] == 0) {
-            processes[idx].turnaround_time = time - processes[idx].arrival_time;
-            processes[idx].waiting_time = processes[idx].turnaround_time - processes[idx].total_cpu_burst;
+        if (remaining[index] == 0) {
+            processes[index].turnaround_time = time - processes[index].arrival_time;
+            processes[index].waiting_time = processes[index].turnaround_time - processes[index].total_cpu_burst;
             completed++;
         }
     }
@@ -203,38 +202,38 @@ void PreemptivePriority() {
     }
 
     while (completed < process_count) {
-        int idx = -1;
+        int index = -1;
         int highest_priority = 100;
         for (int i = 0; i < process_count; i++) {
             if (processes[i].arrival_time <= time && remaining[i] > 0 && processes[i].priority < highest_priority) {
                 highest_priority = processes[i].priority;
-                idx = i;
+                index = i;
             }
         }
-        if (idx == -1) {
+        if (index == -1) {
             time++;
             continue;
         }
 
-        if (last_pid != idx) {
+        if (last_pid != index) {
             if (last_pid != -1)
                 AddGanttEntry(last_pid, time - 1, time);
-            AddGanttEntry(idx, time, time + 1);
+            AddGanttEntry(index, time, time + 1);
         }
         else {
-            if (gantt_size > 0 && gantt_chart[gantt_size - 1].pid == idx && gantt_chart[gantt_size - 1].end_time == time)
+            if (gantt_size > 0 && gantt_chart[gantt_size - 1].pid == index && gantt_chart[gantt_size - 1].end_time == time)
                 gantt_chart[gantt_size - 1].end_time++;
             else
-                AddGanttEntry(idx, time, time + 1);
+                AddGanttEntry(index, time, time + 1);
         }
 
-        remaining[idx]--;
+        remaining[index]--;
         time++;
-        last_pid = idx;
+        last_pid = index;
 
-        if (remaining[idx] == 0) {
-            processes[idx].turnaround_time = time - processes[idx].arrival_time;
-            processes[idx].waiting_time = processes[idx].turnaround_time - processes[idx].total_cpu_burst;
+        if (remaining[index] == 0) {
+            processes[index].turnaround_time = time - processes[index].arrival_time;
+            processes[index].waiting_time = processes[index].turnaround_time - processes[index].total_cpu_burst;
             completed++;
         }
     }
