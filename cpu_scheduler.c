@@ -58,7 +58,6 @@ void PrintGanttChart() {
 void InitProcesses() {
     for (int i = 0; i < process_count; i++) {
         processes[i] = original_processes[i];
-        processes[i].cpu_executed = 0;
         processes[i].waiting_time = 0;
         processes[i].turnaround_time = 0;
     }
